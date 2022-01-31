@@ -21,7 +21,7 @@ https://www.hackingarticles.in/active-directory-enumeration-rpcclient/
 
 
 ### Active Directory Enumeration: BloodHound
-https://www.hackingarticles.in/active-directory-enumeration-bloodhound/
+https://www.hackingarticles.in/active-directory-enumeration-bloodhound/ \
 https://swepstopia.com/bloodhound-enumeration/
 
 ```
