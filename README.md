@@ -41,6 +41,7 @@ Get-ADUser -Filter * -Properties * | Where {$_.ServicePrincipalName -ne $null} |
 
 
 ### Enumerate logged-in and sessions users
+
 ```console
 powershell -executionpolicy bypass
 PS C:\AD> Import-Module .\PowerView.ps1
@@ -114,6 +115,9 @@ wmic useraccount get name,sid
 https://github.com/insidetrust/statistically-likely-usernames \
 #To Domain controller
 
+```Shell
+crackmapexec smb 192.168.102.172 -u ' ' -p '' --rid-brute
+```
 ```Shell
 impacket-GetADUsers -all  yuncorp.local/ -dc-ip 192.168.100.20
 impacket-GetADUsers -all  yuncorp.local/yenriquez:<pwd> -dc-ip 192.168.100.20
