@@ -285,15 +285,21 @@ https://raw.githubusercontent.com/mubix/pykek/master/ms14-068.py
 impacket-goldenPac 'htb.local/james:J@m3s_P@ssW0rd!@mantis.htb.local'
 ```
 
+#### Escalating Privileges with DNSAdmins Group
+https://medium.com/r3d-buck3t/escalating-privileges-with-dnsadmins-group-active-directory-6f7adbc7005b
+https://hackmag.com/security/windows-ad-escalation/
+
 #### Active Directory Privilege Escalation (CVE-2021–42278)
 https://www.hackingarticles.in/active-directory-privilege-escalation-cve-2021-42278/ \
 https://github.com/Ridter/noPac \
 https://github.com/WazeHell/sam-the-admin \
 https://swepstopia.com/samaccountname-spoofing-cve-2021-42278/ \
-https://exploit.ph/cve-2021-42287-cve-2021-42278-weaponisation.html
+https://exploit.ph/cve-2021-42287-cve-2021-42278-weaponisation.html \
+https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing
 
 #### Print Nightmare CVE-2021-1675
 https://swepstopia.com/print-nightmare/
+https://book.hacktricks.xyz/windows/active-directory-methodology/printers-spooler-service-abuse
 
 #### Net Zero Logon CVE-2020-1472
 https://swepstopia.com/net-zero-logon/
