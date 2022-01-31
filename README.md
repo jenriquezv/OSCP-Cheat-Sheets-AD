@@ -65,6 +65,10 @@ C:\Windows\Temp>setspn -T active -Q */*
 C:\Windows\Temp>powershell -ExecutionPolicy Bypass -File querySPN.ps1
 ```
 ```console
+*Evil-WinRM* PS C:\Users\anirudh\Documents> powerview.ps1
+Get-NetUser -SPN
+```
+```console
 $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
 $PDC = ($domainObj.PdcRoleOwner).Name
 $SearchString = "LDAP://"
