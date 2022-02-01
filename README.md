@@ -417,8 +417,9 @@ https://swepstopia.com/impersonation-tokens/
 
 
 ### GPO
+```console
 python3 /opt/gpp-decrypt/gpp-decrypt.py -f ./Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml
-
+```
 
 #### Kerberos MS14-068
 https://wizard32.net/blog/knock-and-pass-kerberos-exploitation.html \
@@ -440,11 +441,11 @@ https://exploit.ph/cve-2021-42287-cve-2021-42278-weaponisation.html \
 https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing
 
 #### Print Nightmare CVE-2021-1675
-https://swepstopia.com/print-nightmare/
+https://swepstopia.com/print-nightmare/ \
 https://book.hacktricks.xyz/windows/active-directory-methodology/printers-spooler-service-abuse
 
 #### Net Zero Logon CVE-2020-1472
-https://swepstopia.com/net-zero-logon/
+https://swepstopia.com/net-zero-logon/ \
 https://github.com/dirkjanm/CVE-2020-1472
 
 #### log4j CVE-2021-44228
